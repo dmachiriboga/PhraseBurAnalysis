@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from collections import defaultdict
 from scipy.stats import linregress
+from scipy.optimize import curve_fit
+import re
+import warnings
 
 # Load the CSV
 df = pd.read_csv("PhraseBur.csv", sep=';')
@@ -12,41 +15,123 @@ artist_sig_counts_increase = defaultdict(int)
 artist_sig_counts_decrease = defaultdict(int)
 
 # Helper to format performer names
-import re
 def get_artist_from_id(id_str):
     artist = id_str.split('_')[0]
     artist = re.sub(r'(?<!^)([A-Z])', r' \1', artist)
     return artist
 
+# Suppress curve fitting warnings
+warnings.filterwarnings("ignore")
+
+# Model functions
+def exp_func(t, a, b):
+    return a * np.exp(b * t)
+
+def log_func(t, a, b):
+    # Add small value to avoid log(0)
+    return a * np.log(t + 1e-6) + b
+
+def fit_and_evaluate_models(x, y):
+    models = {}
+
+    # Linear
+    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    y_pred = slope * x + intercept
+    models['linear'] = {
+        'params': (slope, intercept),
+        'r2': r_value ** 2,
+        'p_value': p_value,
+        'direction': 'increase' if slope > 0 else ('decrease' if slope < 0 else None)
+    }
+
+    # Exponential
+    try:
+        popt, _ = curve_fit(exp_func, x, y, maxfev=10000)
+        y_exp = exp_func(x, *popt)
+        r2_exp = 1 - np.sum((y - y_exp) ** 2) / np.sum((y - np.mean(y)) ** 2)
+        direction = 'increase' if popt[1] > 0 else ('decrease' if popt[1] < 0 else None)
+        models['exponential'] = {
+            'params': popt,
+            'r2': r2_exp,
+            'p_value': None,
+            'direction': direction
+        }
+    except Exception:
+        pass
+
+    # Logarithmic
+    try:
+        popt, _ = curve_fit(log_func, x + 1, y, maxfev=10000)  # x+1 to avoid log(0)
+        y_log = log_func(x + 1, *popt)
+        r2_log = 1 - np.sum((y - y_log) ** 2) / np.sum((y - np.mean(y)) ** 2)
+        direction = 'increase' if popt[0] > 0 else ('decrease' if popt[0] < 0 else None)
+        models['logarithmic'] = {
+            'params': popt,
+            'r2': r2_log,
+            'p_value': None,
+            'direction': direction
+        }
+    except Exception:
+        pass
+
+    # Find best model by R²
+    best_model = max(models.items(), key=lambda x: x[1]['r2'])
+    return best_model[0], best_model[1], models
+
+# Process each phrase
 for (solo_id, phrase_id), group in df.groupby(['id', 'seg_id']):
     bur_values = group['swing_ratios'].astype(float).tolist()
     n = len(bur_values)
     if n < 3:
         continue
+
     x = np.arange(n)
     y = np.array(bur_values)
-    slope, intercept, r_value, p_value, std_err = linregress(x, y)
-    sig = p_value < 0.05
-    direction = None
-    if sig:
-        if slope > 0:
-            direction = 'increase'
-        elif slope < 0:
-            direction = 'decrease'
+
+    best_model_name, best_model_data, all_models = fit_and_evaluate_models(x, y)
     artist = get_artist_from_id(solo_id)
     artist_phrase_counts[artist] += 1
-    if sig and slope > 0:
-        artist_sig_counts_increase[artist] += 1
-    if sig and slope < 0:
-        artist_sig_counts_decrease[artist] += 1
+
+    # Check for significant increase/decrease in any model
+    counted_increase = False
+    counted_decrease = False
+
+    # Linear: p-value < 0.05
+    linear = all_models.get('linear')
+    if linear and linear['p_value'] is not None and linear['p_value'] < 0.05:
+        if linear['direction'] == 'increase':
+            artist_sig_counts_increase[artist] += 1
+            counted_increase = True
+        elif linear['direction'] == 'decrease':
+            artist_sig_counts_decrease[artist] += 1
+            counted_decrease = True
+
+    # Exponential: R² > 0.5
+    exp = all_models.get('exponential')
+    if exp and exp['r2'] > 0.5:
+        if exp['direction'] == 'increase' and not counted_increase:
+            artist_sig_counts_increase[artist] += 1
+            counted_increase = True
+        elif exp['direction'] == 'decrease' and not counted_decrease:
+            artist_sig_counts_decrease[artist] += 1
+            counted_decrease = True
+
+    # Logarithmic: R² > 0.5
+    logm = all_models.get('logarithmic')
+    if logm and logm['r2'] > 0.5:
+        if logm['direction'] == 'increase' and not counted_increase:
+            artist_sig_counts_increase[artist] += 1
+            counted_increase = True
+        elif logm['direction'] == 'decrease' and not counted_decrease:
+            artist_sig_counts_decrease[artist] += 1
+            counted_decrease = True
+
     results.append({
         'id': solo_id,
         'seg_id': phrase_id,
         'n_values': n,
-        'slope': slope,
-        'p_value': p_value,
-        'sig': sig,
-        'direction': direction,
+        'best_model': best_model_name,
+        'best_r2': best_model_data['r2'],
         'artist': artist
     })
 
