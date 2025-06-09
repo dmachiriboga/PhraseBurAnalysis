@@ -1,0 +1,22 @@
+# Ignore data files and outputs
+PhraseBur.csv
+*.csv
+*.tsv
+*.xlsx
+*.json
+*.npz
+*.npy
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.log
+*.out
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.svg
+__pycache__/
+*.pyc
+.DS_Store
