@@ -98,33 +98,45 @@ for bur_values in random_phrases:
     counted_increase = False
     counted_decrease = False
 
-    # Linear: p-value < 0.05
+    # Linear: p-value < 0.05 AND predicted change >= 0.456 or <= -0.456
     linear = all_models.get('linear')
     if linear and linear['p_value'] is not None and linear['p_value'] < 0.05:
-        if linear['direction'] == 'increase':
+        slope, intercept = linear['params']
+        pred_start = slope * x[0] + intercept
+        pred_end = slope * x[-1] + intercept
+        delta = pred_end - pred_start
+        if delta >= 0.456:
             sig_inc += 1
             counted_increase = True
-        elif linear['direction'] == 'decrease':
+        elif delta <= -0.456:
             sig_dec += 1
             counted_decrease = True
 
-    # Exponential: R² > 0.5
+    # Exponential: R² > 0.8 AND predicted change >= 0.456 or <= -0.456
     exp = all_models.get('exponential')
-    if exp and exp['r2'] > 0.5:
-        if exp['direction'] == 'increase' and not counted_increase:
+    if exp and exp['r2'] > 0.8:
+        a, b = exp['params']
+        pred_start = a * np.exp(b * x[0])
+        pred_end = a * np.exp(b * x[-1])
+        delta = pred_end - pred_start
+        if delta >= 0.456 and not counted_increase:
             sig_inc += 1
             counted_increase = True
-        elif exp['direction'] == 'decrease' and not counted_decrease:
+        elif delta <= -0.456 and not counted_decrease:
             sig_dec += 1
             counted_decrease = True
 
-    # Logarithmic: R² > 0.5
+    # Logarithmic: R² > 0.8 AND predicted change >= 0.456 or <= -0.456
     logm = all_models.get('logarithmic')
-    if logm and logm['r2'] > 0.5:
-        if logm['direction'] == 'increase' and not counted_increase:
+    if logm and logm['r2'] > 0.8:
+        a, b = logm['params']
+        pred_start = a * np.log(x[0] + 1e-6) + b
+        pred_end = a * np.log(x[-1] + 1 + 1e-6) + b
+        delta = pred_end - pred_start
+        if delta >= 0.456 and not counted_increase:
             sig_inc += 1
             counted_increase = True
-        elif logm['direction'] == 'decrease' and not counted_decrease:
+        elif delta <= -0.456 and not counted_decrease:
             sig_dec += 1
             counted_decrease = True
 
