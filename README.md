@@ -36,7 +36,8 @@ the value of computational methods in jazz research.
 
 1. [Download](https://jazzomat.hfm-weimar.de/download/download.html) the relevant data from the Weimar Jazz Database.
 2. Create `PhraseBur.csv` using [MeloSpy](https://jazzomat.hfm-weimar.de/download/download.html) and place it in the root directory.
-3. Run the analysis scripts as needed (see script headers for details).
+3. Install dependencies: `poetry install`
+4. Run analysis scripts: `poetry run python src/script_name.py` (see script headers for details).
 
 ## Citations
 

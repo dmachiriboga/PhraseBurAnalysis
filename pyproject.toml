@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "shape-of-swing"
+version = "0.1.0"
+authors = ["Liam Pond <liam.pond@mail.mcgill.ca>"]
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.0"
+numpy = "^1.26.0"
+scipy = "^1.13.0"
+matplotlib = "^3.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
