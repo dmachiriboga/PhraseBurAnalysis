@@ -85,4 +85,5 @@ ipython_config.py
 .DS_Store
 
 # Project specific
+outputs/
 bur_histograms/

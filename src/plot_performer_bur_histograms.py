@@ -7,7 +7,7 @@ import os
 df = pd.read_csv("PhraseBur.csv", sep=';')
 
 # Create output directory for histograms
-output_dir = "bur_histograms"
+output_dir = "outputs/bur_histograms"
 os.makedirs(output_dir, exist_ok=True)
 
 # Get all unique performers
@@ -26,13 +26,13 @@ for performer in performers:
     if bur_values.empty:
         continue
     # Histogram bins: 0.1 increments from 1.0 to 2.5
-    bins = np.arange(1.0, 2.6, 0.1)
+    bin_edges = np.arange(1.0, 2.6, 0.1).tolist()
     plt.figure(figsize=(8, 5))
-    plt.hist(bur_values, bins=bins, edgecolor='black', alpha=0.7)
+    plt.hist(bur_values, bins=bin_edges, edgecolor='black', alpha=0.7)
     plt.title(f"BUR Histogram for {format_performer(performer)}")
     plt.xlabel("BUR Value")
     plt.ylabel("Count")
-    plt.xticks(bins, rotation=45)
+    plt.xticks(bin_edges, rotation=45)
     plt.tight_layout()
     # Save to file
     filename = os.path.join(output_dir, f"{performer}_bur_histogram.png")

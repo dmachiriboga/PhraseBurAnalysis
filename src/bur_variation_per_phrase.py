@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from collections import defaultdict
 
 # Load the CSV
@@ -65,4 +66,5 @@ for artist, avg_std, count in artist_avg_std[:n_top]:
     print(f"{artist}: avg phrase stddev = {avg_std:.3f} ({count} phrases)")
 
 # Optionally, save the phrase-level variation data
-variation_df.to_csv("phrase_bur_variation.csv", index=False)
+os.makedirs("outputs", exist_ok=True)
+variation_df.to_csv("outputs/phrase_bur_variation.csv", index=False)

@@ -94,8 +94,10 @@ for (solo_id, phrase_id), group in df.groupby(['id', 'seg_id']):
     })
 
 # Convert to DataFrame and save
+import os
+os.makedirs("outputs", exist_ok=True)
 out = pd.DataFrame(results)
-out.to_csv("phrase_bur_evolution.csv", index=False)
+out.to_csv("outputs/phrase_bur_evolution.csv", index=False)
 
 # Calculate percentages (excluding "both_higher" from beginning/end percentages)
 pct_both = 100 * category_counts["both_higher"] / total if total else 0
