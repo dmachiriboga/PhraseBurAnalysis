@@ -39,12 +39,14 @@ def fit_and_evaluate_models(x, y):
     models = {}
 
     # Linear
-    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    # Suppress type checking for scipy linregress return values
+    linear_result = linregress(x, y)  # type: ignore[misc]
+    slope, intercept, r_value, p_value, std_err = linear_result  # type: ignore[misc]
     models['linear'] = {
         'params': (slope, intercept),
-        'r2': r_value ** 2,
+        'r2': r_value ** 2,  # type: ignore[operator]
         'p_value': p_value,
-        'direction': 'increase' if slope > 0 else ('decrease' if slope < 0 else None)
+        'direction': 'increase' if slope > 0 else ('decrease' if slope < 0 else None)  # type: ignore[operator]
     }
 
     # Exponential

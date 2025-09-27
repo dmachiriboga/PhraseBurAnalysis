@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 from collections import defaultdict
 from scipy.stats import linregress
 from scipy.optimize import curve_fit
@@ -35,13 +36,15 @@ def fit_and_evaluate_models(x, y):
     models = {}
 
     # Linear
-    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+    # Suppress type checking for scipy linregress return values
+    linear_result = linregress(x, y)  # type: ignore[misc]
+    slope, intercept, r_value, p_value, std_err = linear_result  # type: ignore[misc]
     y_pred = slope * x + intercept
     models['linear'] = {
         'params': (slope, intercept),
-        'r2': r_value ** 2,
+        'r2': r_value ** 2,  # type: ignore[operator]
         'p_value': p_value,
-        'direction': 'increase' if slope > 0 else ('decrease' if slope < 0 else None)
+        'direction': 'increase' if slope > 0 else ('decrease' if slope < 0 else None)  # type: ignore[operator]
     }
 
     # Exponential
@@ -159,7 +162,6 @@ def balanced_metric(sig_count, total_count):
     if total_count == 0:
         return 0
     pct = sig_count / total_count
-    import math
     return pct * (math.log(total_count + 1) ** 1.5)
 
 # Prepare stats for display
