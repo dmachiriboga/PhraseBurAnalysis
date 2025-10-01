@@ -17,6 +17,7 @@ from collections import defaultdict
 
 from utils.data_utils import load_phrasebur_csv, get_artist_from_id, ensure_output_dir
 from analysis.bur_surge_analysis import linear_trend_analysis, fdr_correction
+from utils.config import FDR_ALPHA
 
 
 def main():
@@ -56,7 +57,7 @@ def main():
 
     # Apply FDR correction
     print("Applying False Discovery Rate (FDR) correction...")
-    reject, p_corrected = fdr_correction(all_p_values, alpha=0.05)
+    reject, p_corrected = fdr_correction(all_p_values, alpha=FDR_ALPHA)
     
     # Add corrected p-values to results
     for i, result in enumerate(results):
@@ -67,7 +68,7 @@ def main():
     sig_increase = sum(1 for r in results if r['significant_fdr'] and r['direction'] == 'increase')
     sig_decrease = sum(1 for r in results if r['significant_fdr'] and r['direction'] == 'decrease')
 
-    print(f"FDR correction complete (α = 0.05)")
+    print(f"FDR correction complete (α = {FDR_ALPHA})")
     print()
     print("=" * 60)
     print("OVERALL RESULTS")
@@ -134,10 +135,10 @@ def main():
     print()
     print("Statistical Notes:")
     print("- Used linear regression to detect BUR trends")
-    print("- Applied Benjamini-Hochberg FDR correction (α = 0.05)")
+    print(f"- Applied Benjamini-Hochberg FDR correction (α = {FDR_ALPHA})")
     print("- Slope: BUR change per position (negative = decrease)")
     print("- conf_interval: 95% confidence interval for slope")
-    print("- significant_fdr: True if FDR-corrected p < 0.05")
+    print(f"- significant_fdr: True if FDR-corrected p < {FDR_ALPHA}")
     print("=" * 60)
 
 

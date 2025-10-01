@@ -7,7 +7,7 @@ to detect trends (increases/decreases) in swing timing within phrases.
 
 import numpy as np
 from scipy import stats
-from utils.config import MIN_BUR_VALUES
+from utils.config import MIN_BUR_VALUES, CONFIDENCE_LEVEL, LINEAR_REGRESSION_PARAMS, FDR_ALPHA
 
 
 def linear_trend_analysis(bur_values):
@@ -24,13 +24,14 @@ def linear_trend_analysis(bur_values):
             - r2: Coefficient of determination (proportion of variance explained)
             - p_value: Significance of the slope (null hypothesis: slope = 0)
             - std_err: Standard error of the slope
-            - conf_interval: 95% confidence interval for the slope
+            - conf_interval: Confidence interval for the slope (default 95%)
             - direction: 'increase', 'decrease', or 'none'
             - n_values: Number of BUR values
             
     Note:
         - Uses scipy.stats.linregress for regression
-        - p_value tests H0: slope = 0 (no trend)
+        - p_value tests H0: slope = 0 (no trend) with two-tailed test
+        - Confidence interval uses t-distribution with n-2 degrees of freedom
         - Assumes independence of observations (potential limitation)
     """
     n = len(bur_values)
@@ -43,10 +44,14 @@ def linear_trend_analysis(bur_values):
     # Perform linear regression
     result = stats.linregress(x, y)
     
-    # Calculate 95% confidence interval for slope
-    # CI = slope ± t_critical * std_err
-    # For 95% CI with n-2 degrees of freedom
-    t_critical = stats.t.ppf(0.975, n - 2)  # Two-tailed
+    # Calculate confidence interval for slope
+    # For a two-tailed test with confidence_level (e.g., 95%), we need the
+    # critical value at (1 + confidence_level) / 2 = 0.975 for 95%
+    # This accounts for splitting alpha/2 into each tail
+    alpha = 1 - CONFIDENCE_LEVEL
+    t_percentile = 1 - alpha / 2  # 0.975 for 95% CI
+    df = n - LINEAR_REGRESSION_PARAMS  # degrees of freedom
+    t_critical = stats.t.ppf(t_percentile, df)
     ci_lower = result.slope - t_critical * result.stderr # type: ignore
     ci_upper = result.slope + t_critical * result.stderr # type: ignore
     
@@ -70,13 +75,13 @@ def linear_trend_analysis(bur_values):
     }
 
 
-def fdr_correction(p_values, alpha=0.05):
+def fdr_correction(p_values, alpha=FDR_ALPHA):
     """
     Apply Benjamini-Hochberg FDR correction for multiple testing.
     
     Args:
         p_values: List of p-values to correct
-        alpha: Desired false discovery rate (default: 0.05)
+        alpha: Desired false discovery rate (default from config: 0.05)
         
     Returns:
         Tuple of (reject, p_values_corrected)
