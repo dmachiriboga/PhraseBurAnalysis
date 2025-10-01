@@ -7,6 +7,7 @@ to detect trends (increases/decreases) in swing timing within phrases.
 
 import numpy as np
 from scipy import stats
+from statsmodels.stats.multitest import multipletests
 from statsmodels.stats.stattools import durbin_watson
 from utils.config import MIN_BUR_VALUES, CONFIDENCE_LEVEL, LINEAR_REGRESSION_PARAMS, FDR_ALPHA
 
@@ -104,8 +105,6 @@ def fdr_correction(p_values, alpha=FDR_ALPHA):
         This is less conservative than Bonferroni correction and more
         appropriate when testing many hypotheses.
     """
-    from statsmodels.stats.multitest import multipletests
-    
     # Remove None values for correction
     valid_p_values = [p for p in p_values if p is not None]
     
