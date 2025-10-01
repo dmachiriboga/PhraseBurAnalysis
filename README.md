@@ -32,13 +32,64 @@ expressive device capable of articulating large-scale musical structure. By empi
 microrhythmic gestures across a broad corpus, our study highlights the interpretive depth of swing and
 the value of computational methods in jazz research.
 
+## Project Structure
+
+```
+PhraseBurAnalysis/
+├── analysis/              # Statistical analysis modules
+│   ├── bur_surge_analysis.py
+│   ├── bur_phrase_structure_analysis.py
+│   └── bur_variation_analysis.py
+├── cli/                   # Command-line interface scripts
+│   ├── bur_surge_cli.py
+│   ├── bur_phrase_structure_cli.py
+│   ├── bur_variation_cli.py
+│   ├── bur_histogram_cli.py
+│   ├── bur_surge_null_model_cli.py
+│   └── phrase_bur_null_model_cli.py
+├── utils/                 # Utility functions
+│   └── data_utils.py
+├── visualization/         # Visualization modules
+│   └── bur_histograms.py
+├── outputs/               # Generated outputs (CSV, PNG)
+├── PhraseBur.csv         # Input data
+└── pyproject.toml        # Poetry configuration
+```
+
 ## Usage
+
+### Setup
 
 1. [Download](https://jazzomat.hfm-weimar.de/download/download.html) the relevant data from the Weimar Jazz Database.
 2. Download the [MeloSpyGUI](https://jazzomat.hfm-weimar.de/download/download.html) and open it by navigating to the `bin` directory and opening `mss_gui`. You may need to override your computer's security controls to open this file. 
 3. Create `PhraseBur.csv` using the MeloSpyGUI.
 4. Install dependencies: `poetry install`
-5. Run analysis scripts: `poetry run python src/script_name.py` (see script headers for details).
+
+### Running Analyses
+
+All CLI scripts are located in the `cli/` directory and can be run with:
+
+```bash
+poetry run python cli/<script_name>.py
+```
+
+**Available Scripts:**
+
+- `bur_surge_cli.py` - Analyzes trends in BUR values across phrase positions
+- `bur_phrase_structure_cli.py` - Compares phrase beginnings/endings vs. middle sections
+- `bur_variation_cli.py` - Analyzes variation (standard deviation) in BUR per phrase
+- `bur_histogram_cli.py` - Creates histograms of BUR values for each performer
+- `bur_surge_null_model_cli.py` - Tests surge analysis against random data
+- `phrase_bur_null_model_cli.py` - Tests phrase structure analysis against random data
+
+**Example:**
+
+```bash
+poetry run python cli/bur_surge_cli.py
+poetry run python cli/bur_histogram_cli.py
+```
+
+All outputs (CSV files, PNG visualizations) are saved to the `outputs/` directory.
 
 ## Citations
 
