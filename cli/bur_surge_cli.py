@@ -68,6 +68,11 @@ def main():
     sig_increase = sum(1 for r in results if r['significant_fdr'] and r['direction'] == 'increase')
     sig_decrease = sum(1 for r in results if r['significant_fdr'] and r['direction'] == 'decrease')
 
+    # Calculate Durbin-Watson statistics
+    dw_values = [r['durbin_watson'] for r in results]
+    mean_dw = sum(dw_values) / len(dw_values)
+    autocorr_phrases = sum(1 for dw in dw_values if dw < 1.5)  # Strong positive autocorrelation
+
     print(f"FDR correction complete (α = {FDR_ALPHA})")
     print()
     print("=" * 60)
@@ -75,6 +80,11 @@ def main():
     print("=" * 60)
     print(f"Significant increase: {sig_increase} / {total_phrases} ({100*sig_increase/total_phrases:.1f}%)")
     print(f"Significant decrease: {sig_decrease} / {total_phrases} ({100*sig_decrease/total_phrases:.1f}%)")
+    print()
+    print("Autocorrelation Analysis:")
+    print(f"Mean Durbin-Watson statistic: {mean_dw:.3f}")
+    print(f"  (2.0 = no autocorrelation, <2.0 = positive, >2.0 = negative)")
+    print(f"Phrases with strong autocorrelation (DW < 1.5): {autocorr_phrases} ({100*autocorr_phrases/total_phrases:.1f}%)")
     print()
 
     # Per-artist statistics
@@ -125,7 +135,8 @@ def main():
     
     # Reorder columns for clarity
     cols = ['id', 'seg_id', 'artist', 'n_values', 'slope', 'conf_interval', 
-            'r2', 'p_value', 'p_value_corrected', 'significant_fdr', 'direction']
+            'r2', 'p_value', 'p_value_corrected', 'significant_fdr', 'direction', 
+            'durbin_watson', 'std_err', 'intercept']
     df_results = df_results[cols]
     
     output_file = 'outputs/bur_surge_results_fdr.csv'
@@ -139,6 +150,12 @@ def main():
     print("- Slope: BUR change per position (negative = decrease)")
     print("- conf_interval: 95% confidence interval for slope")
     print(f"- significant_fdr: True if FDR-corrected p < {FDR_ALPHA}")
+    print("- durbin_watson: Autocorrelation test (2 = independent, <2 = positive autocorr)")
+    print()
+    print("Limitations:")
+    print("- Linear regression assumes independence (often violated by musical data)")
+    print("- Autocorrelation can lead to underestimated standard errors")
+    print("- P-values may be optimistic; true significance may be even rarer")
     print("=" * 60)
 
 

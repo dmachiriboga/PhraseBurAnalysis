@@ -7,6 +7,7 @@ to detect trends (increases/decreases) in swing timing within phrases.
 
 import numpy as np
 from scipy import stats
+from statsmodels.stats.stattools import durbin_watson
 from utils.config import MIN_BUR_VALUES, CONFIDENCE_LEVEL, LINEAR_REGRESSION_PARAMS, FDR_ALPHA
 
 
@@ -27,12 +28,14 @@ def linear_trend_analysis(bur_values):
             - conf_interval: Confidence interval for the slope (default 95%)
             - direction: 'increase', 'decrease', or 'none'
             - n_values: Number of BUR values
+            - durbin_watson: Test statistic for autocorrelation (2 = none, <2 = positive, >2 = negative)
             
     Note:
         - Uses scipy.stats.linregress for regression
         - p_value tests H0: slope = 0 (no trend) with two-tailed test
         - Confidence interval uses t-distribution with n-2 degrees of freedom
         - Assumes independence of observations (potential limitation)
+        - Durbin-Watson test checks this assumption (values near 2 indicate independence)
     """
     n = len(bur_values)
     if n < MIN_BUR_VALUES:
@@ -63,6 +66,13 @@ def linear_trend_analysis(bur_values):
     else:
         direction = 'none'
     
+    # Calculate Durbin-Watson statistic for autocorrelation
+    # DW ≈ 2: no autocorrelation
+    # DW < 2: positive autocorrelation (adjacent values are similar)
+    # DW > 2: negative autocorrelation (adjacent values alternate)
+    residuals = y - (result.slope * x + result.intercept) # type: ignore
+    dw_stat = durbin_watson(residuals)
+    
     return {
         'slope': result.slope, # type: ignore
         'intercept': result.intercept, # type: ignore
@@ -71,7 +81,8 @@ def linear_trend_analysis(bur_values):
         'std_err': result.stderr, # type: ignore
         'conf_interval': (ci_lower, ci_upper),
         'direction': direction,
-        'n_values': n
+        'n_values': n,
+        'durbin_watson': dw_stat
     }
 
 
