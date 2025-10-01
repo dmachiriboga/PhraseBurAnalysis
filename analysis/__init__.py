@@ -3,9 +3,8 @@ Analysis modules for statistical calculations, model fitting, and trend detectio
 """
 
 from .bur_surge_analysis import (
-    exp_func,
-    log_func,
-    fit_and_evaluate_models
+    linear_trend_analysis,
+    fdr_correction
 )
 
 from .bur_phrase_structure_analysis import (
@@ -17,9 +16,8 @@ from .bur_variation_analysis import (
 )
 
 __all__ = [
-    'exp_func',
-    'log_func',
-    'fit_and_evaluate_models',
+    'linear_trend_analysis',
+    'fdr_correction',
     'phrase_structure_stats',
     'phrase_variation_stats'
 ]
