@@ -17,7 +17,7 @@ from collections import defaultdict
 
 from utils.data_utils import load_phrasebur_csv, get_artist_from_id, ensure_output_dir
 from analysis.bur_surge_analysis import linear_trend_analysis, fdr_correction
-from utils.config import FDR_ALPHA
+from utils.config import FDR_ALPHA, MIN_BUR_VALUES, DW_AUTOCORR_THRESHOLD
 
 
 def main():
@@ -26,7 +26,6 @@ def main():
 
     results = []
     all_p_values = []
-    phrase_info = []  # Store (solo_id, phrase_id, artist) for later
 
     print("\nAnalyzing BUR trends across phrases...")
     print("=" * 60)
@@ -49,10 +48,9 @@ def main():
         })
         
         all_p_values.append(trend['p_value'])
-        phrase_info.append((solo_id, phrase_id, artist))
 
     total_phrases = len(results)
-    print(f"Analyzed {total_phrases} phrases with n >= 6 BUR values")
+    print(f"Analyzed {total_phrases} phrases with n >= {MIN_BUR_VALUES} BUR values")
     print()
 
     # Apply FDR correction
@@ -71,7 +69,7 @@ def main():
     # Calculate Durbin-Watson statistics
     dw_values = [r['durbin_watson'] for r in results]
     mean_dw = sum(dw_values) / len(dw_values)
-    autocorr_phrases = sum(1 for dw in dw_values if dw < 1.5)  # Strong positive autocorrelation
+    autocorr_phrases = sum(1 for dw in dw_values if dw < DW_AUTOCORR_THRESHOLD)  # Strong positive autocorrelation
 
     print(f"FDR correction complete (α = {FDR_ALPHA})")
     print()
@@ -84,7 +82,7 @@ def main():
     print("Autocorrelation Analysis:")
     print(f"Mean Durbin-Watson statistic: {mean_dw:.3f}")
     print(f"  (2.0 = no autocorrelation, <2.0 = positive, >2.0 = negative)")
-    print(f"Phrases with strong autocorrelation (DW < 1.5): {autocorr_phrases} ({100*autocorr_phrases/total_phrases:.1f}%)")
+    print(f"Phrases with strong autocorrelation (DW < {DW_AUTOCORR_THRESHOLD}): {autocorr_phrases} ({100*autocorr_phrases/total_phrases:.1f}%)")
     print()
 
     # Per-artist statistics

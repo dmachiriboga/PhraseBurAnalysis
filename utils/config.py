@@ -20,3 +20,10 @@ LINEAR_REGRESSION_PARAMS = 2
 # False Discovery Rate (FDR) alpha level for multiple testing correction
 # 0.05 = 5% false discovery rate (standard threshold)
 FDR_ALPHA = 0.05
+
+# Durbin-Watson threshold for strong positive autocorrelation
+# DW < 1.5 indicates strong positive autocorrelation between adjacent residuals
+# DW ≈ 2.0 = no autocorrelation
+# DW < 2.0 = positive autocorrelation (adjacent values similar)
+# DW > 2.0 = negative autocorrelation (adjacent values alternate)
+DW_AUTOCORR_THRESHOLD = 1.5
