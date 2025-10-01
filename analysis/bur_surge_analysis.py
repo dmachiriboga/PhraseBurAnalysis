@@ -1,20 +1,17 @@
 import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import curve_fit
-import warnings
-from utils.data_utils import get_artist_from_id
 
 def exp_func(t, a, b):
     return a * np.exp(b * t)
 
 def log_func(t, a, b):
-    return a * np.log(t + 1e-6) + b
+    return a * np.log(t + 1e-6) + b # 1e-6 is a tiny number to avoid log(0)
 
 def fit_and_evaluate_models(x, y):
     models = {}
-    # Suppress type checking for scipy linregress return values
+    # Linear regression
     slope, intercept, r_value, p_value, std_err = linregress(x, y)  # type: ignore[misc]
-    y_pred = slope * x + intercept
     models['linear'] = {
         'params': (slope, intercept),
         'r2': r_value ** 2,  # type: ignore[operator]

@@ -3,7 +3,7 @@ from utils.data_utils import get_artist_from_id
 
 def phrase_structure_stats(bur_values, threshold=0.4):
     n = len(bur_values)
-    if n < 3:
+    if n < 6:
         return None
     first_bur = bur_values[0]
     last_bur = bur_values[-1]

@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 def main():
     # Parameters for random data
     total_phrases = 4857  # Match your real data
-    min_phrase_len = 3
+    min_phrase_len = 6
     max_phrase_len = 20
     np.random.seed(42)
 
@@ -39,7 +39,7 @@ def main():
     sig_dec = 0
     for bur_values in random_phrases:
         n = len(bur_values)
-        if n < 3:
+        if n < 6:
             continue
         x = np.arange(n)
         y = np.array(bur_values)

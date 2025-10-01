@@ -29,7 +29,7 @@ def main():
     for (solo_id, phrase_id), group in df.groupby(['id', 'seg_id']):
         bur_values = group['swing_ratios'].astype(float).tolist()
         n = len(bur_values)
-        if n < 3:  # TODO: Consider increasing to n < 4 or n < 5 for more reliable trend detection
+        if n < 6:  # Minimum 6 notes for reliable trend detection
             continue
 
         x = np.arange(n)
