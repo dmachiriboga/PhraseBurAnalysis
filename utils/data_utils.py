@@ -12,6 +12,6 @@ def ensure_output_dir(path="outputs"):
     """Create output directory if it doesn't exist."""
     os.makedirs(path, exist_ok=True)
 
-def load_phrasebur_csv(filename="PhraseBur.csv"):
-    """Load PhraseBur.csv with correct separator."""
+def load_phrasebur_csv(filename="data/phrasebur_filtered.csv"):
+    """Load filtered PhraseBur data with correct separator."""
     return pd.read_csv(filename, sep=';')

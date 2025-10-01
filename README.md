@@ -52,7 +52,9 @@ PhraseBurAnalysis/
 ├── visualization/         # Visualization modules
 │   └── bur_histograms.py
 ├── outputs/               # Generated outputs (CSV, PNG)
-├── PhraseBur.csv         # Input data
+├── data/                 # Data files
+│   ├── phrasebur_raw.csv      # Original unfiltered data
+│   └── phrasebur_filtered.csv # Filtered (n >= 6 BUR values)
 └── pyproject.toml        # Poetry configuration
 ```
 
@@ -62,7 +64,8 @@ PhraseBurAnalysis/
 
 1. [Download](https://jazzomat.hfm-weimar.de/download/download.html) the relevant data from the Weimar Jazz Database.
 2. Download the [MeloSpyGUI](https://jazzomat.hfm-weimar.de/download/download.html) and open it by navigating to the `bin` directory and opening `mss_gui`. You may need to override your computer's security controls to open this file. 
-3. Create `PhraseBur.csv` using the MeloSpyGUI.
+3. Create `data/phrasebur_raw.csv` using the MeloSpyGUI (or use existing raw data).
+4. Run the data cleaning script: `python utils/clean_data.py`
 4. Install dependencies: `poetry install`
 
 ### Running Analyses
