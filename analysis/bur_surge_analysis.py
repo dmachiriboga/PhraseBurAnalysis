@@ -7,6 +7,7 @@ to detect trends (increases/decreases) in swing timing within phrases.
 
 import numpy as np
 from scipy import stats
+from utils.config import MIN_BUR_VALUES
 
 
 def linear_trend_analysis(bur_values):
@@ -33,7 +34,7 @@ def linear_trend_analysis(bur_values):
         - Assumes independence of observations (potential limitation)
     """
     n = len(bur_values)
-    if n < 6:
+    if n < MIN_BUR_VALUES:
         return None
         
     x = np.arange(n)
@@ -46,23 +47,23 @@ def linear_trend_analysis(bur_values):
     # CI = slope ± t_critical * std_err
     # For 95% CI with n-2 degrees of freedom
     t_critical = stats.t.ppf(0.975, n - 2)  # Two-tailed
-    ci_lower = result.slope - t_critical * result.stderr
-    ci_upper = result.slope + t_critical * result.stderr
+    ci_lower = result.slope - t_critical * result.stderr # type: ignore
+    ci_upper = result.slope + t_critical * result.stderr # type: ignore
     
     # Determine direction
-    if result.slope > 0:
+    if result.slope > 0: # type: ignore
         direction = 'increase'
-    elif result.slope < 0:
+    elif result.slope < 0: # type: ignore
         direction = 'decrease'
     else:
         direction = 'none'
     
     return {
-        'slope': result.slope,
-        'intercept': result.intercept,
-        'r2': result.rvalue ** 2,
-        'p_value': result.pvalue,
-        'std_err': result.stderr,
+        'slope': result.slope, # type: ignore
+        'intercept': result.intercept, # type: ignore
+        'r2': result.rvalue ** 2, # type: ignore
+        'p_value': result.pvalue, # type: ignore
+        'std_err': result.stderr, # type: ignore
         'conf_interval': (ci_lower, ci_upper),
         'direction': direction,
         'n_values': n

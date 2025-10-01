@@ -1,9 +1,10 @@
 import numpy as np
 from utils.data_utils import get_artist_from_id
+from utils.config import MIN_BUR_VALUES
 
 def phrase_structure_stats(bur_values, threshold=0.4):
     n = len(bur_values)
-    if n < 6:
+    if n < MIN_BUR_VALUES:
         return None
     first_bur = bur_values[0]
     last_bur = bur_values[-1]

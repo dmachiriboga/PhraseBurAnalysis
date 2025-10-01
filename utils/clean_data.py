@@ -7,9 +7,10 @@ ensuring statistical validity for regression and variation analyses.
 
 import pandas as pd
 from pathlib import Path
+from utils.config import MIN_BUR_VALUES
 
 
-def clean_phrasebur_data(input_csv='data/phrasebur_raw.csv', output_csv='data/phrasebur_filtered.csv', min_bur_values=6):
+def clean_phrasebur_data(input_csv='data/phrasebur_raw.csv', output_csv='data/phrasebur_filtered.csv', min_bur_values=MIN_BUR_VALUES):
     """
     Clean PhraseBur dataset by filtering phrases with insufficient data points.
     
@@ -78,8 +79,8 @@ def main():
     parser.add_argument(
         '--min-values', '-n',
         type=int,
-        default=6,
-        help='Minimum number of BUR values per phrase (default: 6)'
+        default=MIN_BUR_VALUES,
+        help=f'Minimum number of BUR values per phrase (default: {MIN_BUR_VALUES})'
     )
     
     args = parser.parse_args()

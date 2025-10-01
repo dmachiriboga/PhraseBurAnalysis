@@ -7,11 +7,12 @@ Tests phrase structure analysis against random data to establish baseline false-
 import numpy as np
 import pandas as pd
 from utils.data_utils import load_phrasebur_csv
+from utils.config import MIN_BUR_VALUES
 
 def main():
     # Parameters for random data
     total_phrases = 4857  # Match your real data
-    min_phrase_len = 6
+    min_phrase_len = MIN_BUR_VALUES
     max_phrase_len = 20
     np.random.seed(42)
 
@@ -51,7 +52,7 @@ def main():
         sig_counts = {"sig_both": 0, "sig_beginning": 0, "sig_end": 0, "sig_none": 0}
         for bur_values in random_phrases:
             n = len(bur_values)
-            if n < 6:
+            if n < MIN_BUR_VALUES:
                 continue
             # Shuffle for each iteration to simulate random order
             bur_values_iter = np.random.permutation(bur_values)
