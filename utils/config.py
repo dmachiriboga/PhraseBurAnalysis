@@ -27,3 +27,7 @@ FDR_ALPHA = 0.05
 # DW < 2.0 = positive autocorrelation (adjacent values similar)
 # DW > 2.0 = negative autocorrelation (adjacent values alternate)
 DW_AUTOCORR_THRESHOLD = 1.5
+
+# Default number of top performers to display in CLI output
+# Can be overridden by user input at runtime
+DEFAULT_TOP_N = 20
